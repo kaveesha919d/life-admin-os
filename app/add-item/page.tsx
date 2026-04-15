@@ -14,13 +14,33 @@ export default function AddItemPage() {
   const [date, setDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ name, type, date });
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 2600);
-    setName(""); setDate("");
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const newItem = {
+    id: Date.now(),
+    name,
+    type,
+    date,
   };
+
+  // get old items
+  const existingItems = JSON.parse(localStorage.getItem("items") || "[]");
+
+  // add new item
+  const updatedItems = [...existingItems, newItem];
+
+  // save back
+  localStorage.setItem("items", JSON.stringify(updatedItems));
+
+  // UI feedback (keep your design)
+  setSubmitted(true);
+  setTimeout(() => setSubmitted(false), 2600);
+
+  // reset fields
+  setName("");
+  setDate("");
+};
 
   return (
     <>
