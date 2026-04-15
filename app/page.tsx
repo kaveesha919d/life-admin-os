@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <>
@@ -271,7 +273,9 @@ export default function Home() {
           </p>
 
           <div className="lao-cta-group">
-            <button className="lao-btn-primary">Get Started</button>
+            <Link href="/dashboard" className="lao-btn-primary">
+  Get Started
+</Link>
             <button className="lao-btn-secondary">View Demo →</button>
           </div>
 
