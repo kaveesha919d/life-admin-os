@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function DashboardPage() {
   return (
     <>
@@ -289,9 +291,9 @@ export default function DashboardPage() {
             </div>
             <div className="db-topbar-right">
               <span className="db-date-chip">April 2025</span>
-              <button className="db-add-btn">
+              <Link href="/add-item" className="db-add-btn">
                 <span className="db-add-btn-icon">+</span> Add Item
-              </button>
+              </Link>
             </div>
           </div>
 
