@@ -1,6 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function DashboardPage() {
+    const [items, setItems] = useState<any[]>([]);
+
+useEffect(() => {
+  const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
+  setItems(storedItems);
+}, []);
   return (
     <>
       <style>{`
@@ -323,22 +332,37 @@ export default function DashboardPage() {
             <div className="db-panel">
               <h3 className="db-panel-title">Upcoming Items</h3>
               <div className="db-item-list">
-                {[
-                  { name: "Electricity Bill",       sub: "Due in 2 days",      dot: "red",    badge: "Urgent",   badgeClass: "urgent"   },
-                  { name: "Netflix Subscription",   sub: "Renews in 5 days",   dot: "yellow", badge: "Soon",     badgeClass: "soon"     },
-                  { name: "Driving License Renewal",sub: "Expires in 12 days", dot: "blue",   badge: "Upcoming", badgeClass: "upcoming" },
-                ].map(({ name, sub, dot, badge, badgeClass }) => (
-                  <div className="db-item" key={name}>
-                    <div className="db-item-left">
-                      <span className={`db-item-dot ${dot}`} />
-                      <div>
-                        <p className="db-item-name">{name}</p>
-                        <p className="db-item-sub">{sub}</p>
-                      </div>
-                    </div>
-                    <span className={`db-badge ${badgeClass}`}>{badge}</span>
-                  </div>
-                ))}
+                {items.length === 0 ? (
+  <p className="db-item-sub">No items yet. Add your first item.</p>
+) : (
+  items.map((item) => (
+    <div className="db-item" key={item.id}>
+      <div className="db-item-left">
+        <span className={`db-item-dot ${
+          item.type === "bill"
+            ? "red"
+            : item.type === "subscription"
+            ? "yellow"
+            : "blue"
+        }`} />
+        <div>
+          <p className="db-item-name">{item.name}</p>
+          <p className="db-item-sub">{item.date}</p>
+        </div>
+      </div>
+
+      <span className={`db-badge ${
+        item.type === "bill"
+          ? "urgent"
+          : item.type === "subscription"
+          ? "soon"
+          : "upcoming"
+      }`}>
+        {item.type}
+      </span>
+    </div>
+  ))
+)}
               </div>
             </div>
 
