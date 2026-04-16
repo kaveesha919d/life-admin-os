@@ -4,17 +4,64 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function DashboardPage() {
-    const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
 
-useEffect(() => {
-  const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
-  setItems(storedItems);
-}, []);
-const handleDelete = (id: number) => {
-  const updatedItems = items.filter((item) => item.id !== id);
-  setItems(updatedItems);
-  localStorage.setItem("items", JSON.stringify(updatedItems));
-};
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
+    setItems(storedItems);
+  }, []);
+
+  const handleDelete = (id: number) => {
+    const updatedItems = items.filter((item) => item.id !== id);
+    setItems(updatedItems);
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+  };
+
+  const getDateLabel = (dateString: string) => {
+    const today = new Date();
+    const targetDate = new Date(dateString);
+
+    today.setHours(0, 0, 0, 0);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const diffTime = targetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""}`;
+    }
+
+    if (diffDays === 0) {
+      return "Due today";
+    }
+
+    if (diffDays === 1) {
+      return "Due in 1 day";
+    }
+
+    return `Due in ${diffDays} days`;
+  };
+
+  const getUrgencyClass = (dateString: string) => {
+    const today = new Date();
+    const targetDate = new Date(dateString);
+
+    today.setHours(0, 0, 0, 0);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const diffTime = targetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 2) {
+      return { dot: "red", badge: "urgent", text: "Urgent" };
+    }
+
+    if (diffDays <= 7) {
+      return { dot: "yellow", badge: "soon", text: "Soon" };
+    }
+
+    return { dot: "blue", badge: "upcoming", text: "Upcoming" };
+  };
   return (
     <>
       <style>{`
@@ -340,50 +387,42 @@ const handleDelete = (id: number) => {
                 {items.length === 0 ? (
   <p className="db-item-sub">No items yet. Add your first item.</p>
 ) : (
-  items.map((item) => (
+items.map((item) => {
+  const urgency = getUrgencyClass(item.date);
+
+  return (
     <div className="db-item" key={item.id}>
       <div className="db-item-left">
-        <span className={`db-item-dot ${
-          item.type === "bill"
-            ? "red"
-            : item.type === "subscription"
-            ? "yellow"
-            : "blue"
-        }`} />
+        <span className={`db-item-dot ${urgency.dot}`} />
         <div>
           <p className="db-item-name">{item.name}</p>
-          <p className="db-item-sub">{item.date}</p>
+          <p className="db-item-sub">{getDateLabel(item.date)}</p>
         </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-  <span className={`db-badge ${
-    item.type === "bill"
-      ? "urgent"
-      : item.type === "subscription"
-      ? "soon"
-      : "upcoming"
-  }`}>
-    {item.type}
-  </span>
+        <span className={`db-badge ${urgency.badge}`}>
+          {urgency.text}
+        </span>
 
-  <button
-    onClick={() => handleDelete(item.id)}
-    style={{
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.08)",
-      color: "#f87171",
-      borderRadius: "10px",
-      padding: "6px 10px",
-      fontSize: "12px",
-      cursor: "pointer",
-    }}
-  >
-    Delete
-  </button>
-</div>
+        <button
+          onClick={() => handleDelete(item.id)}
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "#f87171",
+            borderRadius: "10px",
+            padding: "6px 10px",
+            fontSize: "12px",
+            cursor: "pointer",
+          }}
+        >
+          Delete
+        </button>
+      </div>
     </div>
-  ))
+  );
+})
 )}
               </div>
             </div>
