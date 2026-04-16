@@ -10,6 +10,11 @@ useEffect(() => {
   const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
   setItems(storedItems);
 }, []);
+const handleDelete = (id: number) => {
+  const updatedItems = items.filter((item) => item.id !== id);
+  setItems(updatedItems);
+  localStorage.setItem("items", JSON.stringify(updatedItems));
+};
   return (
     <>
       <style>{`
@@ -351,15 +356,32 @@ useEffect(() => {
         </div>
       </div>
 
-      <span className={`db-badge ${
-        item.type === "bill"
-          ? "urgent"
-          : item.type === "subscription"
-          ? "soon"
-          : "upcoming"
-      }`}>
-        {item.type}
-      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+  <span className={`db-badge ${
+    item.type === "bill"
+      ? "urgent"
+      : item.type === "subscription"
+      ? "soon"
+      : "upcoming"
+  }`}>
+    {item.type}
+  </span>
+
+  <button
+    onClick={() => handleDelete(item.id)}
+    style={{
+      background: "rgba(255,255,255,0.06)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      color: "#f87171",
+      borderRadius: "10px",
+      padding: "6px 10px",
+      fontSize: "12px",
+      cursor: "pointer",
+    }}
+  >
+    Delete
+  </button>
+</div>
     </div>
   ))
 )}
