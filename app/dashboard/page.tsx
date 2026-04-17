@@ -62,6 +62,22 @@ export default function DashboardPage() {
 
     return { dot: "blue", badge: "upcoming", text: "Upcoming" };
   };
+  const billCount = items.filter((item) => item.type === "bill").length;
+const subscriptionCount = items.filter((item) => item.type === "subscription").length;
+const renewalCount = items.filter((item) => item.type === "renewal").length;
+
+const urgentThisWeekCount = items.filter((item) => {
+  const today = new Date();
+  const targetDate = new Date(item.date);
+
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+
+  const diffTime = targetDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays <= 7;
+}).length;
   return (
     <>
       <style>{`
@@ -361,11 +377,11 @@ export default function DashboardPage() {
           {/* ── Stat cards ── */}
           <div className="db-stat-grid">
             {[
-              { label: "Upcoming Bills",     value: 3,  icon: "💳", trend: "Next due in 2 days",           trendClass: "warn", iconClass: "" },
-              { label: "Subscriptions",      value: 5,  icon: "🔄", trend: "1 price change this month",    trendClass: "",     iconClass: "" },
-              { label: "Renewals",           value: 2,  icon: "📅", trend: "Earliest in 12 days",          trendClass: "",     iconClass: "" },
-              { label: "Urgent This Week",   value: 4,  icon: "⏱", trend: "Needs immediate attention",    trendClass: "warn", iconClass: "red", numClass: "urgent" },
-            ].map(({ label, value, icon, trend, trendClass, iconClass, numClass }) => (
+  { label: "Upcoming Bills", value: billCount, icon: "💳", trend: "Tracked bill items", trendClass: "", iconClass: "" },
+  { label: "Subscriptions", value: subscriptionCount, icon: "🔄", trend: "Tracked subscriptions", trendClass: "", iconClass: "" },
+  { label: "Renewals", value: renewalCount, icon: "📅", trend: "Tracked renewals", trendClass: "", iconClass: "" },
+  { label: "Urgent This Week", value: urgentThisWeekCount, icon: "⏱", trend: "Due within 7 days", trendClass: "warn", iconClass: "red", numClass: "urgent" },
+].map(({ label, value, icon, trend, trendClass, iconClass, numClass }) => (
               <div className="db-stat" key={label}>
                 <p className="db-stat-label">{label}</p>
                 <div className="db-stat-row">
