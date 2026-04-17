@@ -417,25 +417,41 @@ items.map((item) => {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <span className={`db-badge ${urgency.badge}`}>
-          {urgency.text}
-        </span>
+  <span className={`db-badge ${urgency.badge}`}>
+    {urgency.text}
+  </span>
 
-        <button
-          onClick={() => handleDelete(item.id)}
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "#f87171",
-            borderRadius: "10px",
-            padding: "6px 10px",
-            fontSize: "12px",
-            cursor: "pointer",
-          }}
-        >
-          Delete
-        </button>
-      </div>
+  <Link
+    href={`/add-item?id=${item.id}`}
+    style={{
+      background: "rgba(255,255,255,0.06)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      color: "#60a5fa",
+      borderRadius: "10px",
+      padding: "6px 10px",
+      fontSize: "12px",
+      cursor: "pointer",
+      textDecoration: "none",
+    }}
+  >
+    Edit
+  </Link>
+
+  <button
+    onClick={() => handleDelete(item.id)}
+    style={{
+      background: "rgba(255,255,255,0.06)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      color: "#f87171",
+      borderRadius: "10px",
+      padding: "6px 10px",
+      fontSize: "12px",
+      cursor: "pointer",
+    }}
+  >
+    Delete
+  </button>
+</div>
     </div>
   );
 })

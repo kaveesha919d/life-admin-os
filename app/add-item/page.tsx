@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const TYPE_OPTIONS = [
   { value: "bill",         label: "Bill",         icon: "💳", desc: "One-off or recurring payment" },
@@ -14,31 +15,52 @@ export default function AddItemPage() {
   const [date, setDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("id");
+
+  useEffect(() => {
+  if (!editId) return;
+
+  const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
+  const itemToEdit = storedItems.find((item: any) => String(item.id) === editId);
+
+  if (itemToEdit) {
+    setName(itemToEdit.name);
+    setType(itemToEdit.type);
+    setDate(itemToEdit.date);
+  }
+}, [editId]);
+
 const handleSubmit = (e: React.FormEvent) => {
   e.preventDefault();
 
-  const newItem = {
-    id: Date.now(),
-    name,
-    type,
-    date,
-  };
-
-  // get old items
   const existingItems = JSON.parse(localStorage.getItem("items") || "[]");
 
-  // add new item
-  const updatedItems = [...existingItems, newItem];
+  if (editId) {
+    const updatedItems = existingItems.map((item: any) =>
+      String(item.id) === editId
+        ? { ...item, name, type, date }
+        : item
+    );
 
-  // save back
-  localStorage.setItem("items", JSON.stringify(updatedItems));
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+  } else {
+    const newItem = {
+      id: Date.now(),
+      name,
+      type,
+      date,
+    };
 
-  // UI feedback (keep your design)
+    const updatedItems = [...existingItems, newItem];
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+  }
+
   setSubmitted(true);
   setTimeout(() => setSubmitted(false), 2600);
 
-  // reset fields
   setName("");
+  setType("bill");
   setDate("");
 };
 
@@ -286,8 +308,12 @@ const handleSubmit = (e: React.FormEvent) => {
               <span className="ai-badge-dot" />
               Life Admin OS
             </div>
-            <h1 className="ai-title">Add New Item</h1>
-            <p className="ai-subtitle">Track a bill, subscription, or renewal in seconds.</p>
+            <h1 className="ai-title">{editId ? "Edit Item" : "Add New Item"}</h1>
+            <p className="ai-subtitle">
+  {editId
+    ? "Update your bill, subscription, or renewal details."
+    : "Track a bill, subscription, or renewal in seconds."}
+</p>
           </div>
 
           <div className="ai-form-panel">
@@ -343,7 +369,7 @@ const handleSubmit = (e: React.FormEvent) => {
                 type="submit"
                 className={`ai-submit${submitted ? " done" : ""}`}
               >
-                {submitted ? "✓ Item Added" : "Add Item"}
+                {submitted ? "✓ Saved" : editId ? "Update Item" : "Add Item"}
               </button>
 
             </form>
@@ -351,7 +377,11 @@ const handleSubmit = (e: React.FormEvent) => {
             {submitted && (
               <div className="ai-toast">
                 <span>✓</span>
-                <span>Item saved — head back to your dashboard to see it.</span>
+                <span>
+  {editId
+    ? "Item updated — head back to your dashboard to see changes."
+    : "Item saved — head back to your dashboard to see it."}
+</span>
               </div>
             )}
           </div>
